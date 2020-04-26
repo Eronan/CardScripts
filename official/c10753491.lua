@@ -33,7 +33,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if ct==0 then return end
 	local ac=1
 	if ct>1 then
-		Duel.Hint(HINGMSG_NUMBER,tp,HINT_NUMBER)
+		Duel.Hint(HINTMSG_NUMBER,tp,HINT_NUMBER)
 		ac=Duel.AnnounceNumber(tp,1,2)
 	end
 	Duel.ConfirmDecktop(tp,ac)
@@ -45,11 +45,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 	ac=ac-#sg
 	if ac>0 then
-		Duel.SortDecktop(tp,tp,ac)
-		for i=1,ac do
-			local mg=Duel.GetDecktopGroup(tp,1)
-			Duel.MoveSequence(mg:GetFirst(),1)
-		end
+		Duel.MoveToDeckBottom(g)
+		Duel.SortDeckbottom(tp,tp,ac)
 	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)

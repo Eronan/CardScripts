@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetOperation(s.flipop)
 	c:RegisterEffect(e2)
-	--disable
+	--negate effects
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EVENT_CHAIN_SOLVING)
@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	e3:SetCondition(s.discon2)
 	e3:SetOperation(s.disop2)
 	c:RegisterEffect(e3)
-	--to hand
+	--add to hand
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -46,6 +46,7 @@ function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	if rp==tp or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	local c=e:GetHandler()
+	if not tg then return false end
 	return tg:IsContains(c) and c:IsFacedown()
 end
 function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)

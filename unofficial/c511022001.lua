@@ -1,3 +1,4 @@
+--ダイナディシート
 --Dino Deceit
 --scripted by Naim
 local s,id=GetID()
@@ -18,10 +19,10 @@ end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_MZONE,0,nil)
 	local sg=g:GetMinGroup(Card.GetLink)
+	if not sg then return false end
 	local dinlk=sg:GetFirst():GetLink()
-	return
-	not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and rp~=tp and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsLinkMonster() and re:GetHandler():GetLink()>=dinlk
-	and Duel.IsExistingMatchingCard(aux.disfilter1,tp,0,LOCATION_MZONE,1,nil)
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and rp~=tp and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsLinkMonster()
+		and re:GetHandler():GetLink()>=dinlk and Duel.IsExistingMatchingCard(aux.disfilter1,tp,0,LOCATION_MZONE,1,nil)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -75,6 +76,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetCondition(s.bpcondition)
 		e1:SetTargetRange(0,1)
+		e1:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e1,0)
 	end
 end

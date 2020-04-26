@@ -1,7 +1,6 @@
 --パラドクス・ハイドライブ・アトラース
 --Paradox Hydradrive Atlas
---Scripted by Playmaker 772211
---Updated and Fixed by Larry126
+--Scripted by Playmaker 772211, updated and fixed by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
 	--link summon
@@ -49,6 +48,7 @@ function s.initial_effect(c)
 	e5:SetValue(aux.imval1)
 	c:RegisterEffect(e5)
 end
+s.roll_dice=true
 s.listed_series={0x577}
 function s.matfilter(c)
 	return c:IsLevelAbove(5) and c:IsType(TYPE_EFFECT)
@@ -69,7 +69,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
 		e1:SetRange(LOCATION_MZONE)
-		e1:SetValue(math.pow(2,(dieResult-1)))
+		e1:SetValue(2^(dieResult-1))
 		c:RegisterEffect(e1)
 	end
 end
@@ -101,11 +101,8 @@ end
 function s.val(e,c)
 	return e:GetHandler():GetAttribute()
 end
-function s.filter(c,att)
-	return c:IsFaceup() and c:IsAttribute(att)
-end
 function s.con(e)
-	return Duel.IsExistingMatchingCard(s.filter,0,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler(),e:GetHandler():GetAttribute())
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsAttribute,e:GetHandler():GetAttribute()),0,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
 end
 function s.efilter(e,re)
 	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()

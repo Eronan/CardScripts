@@ -29,18 +29,27 @@ function Fusion.SummonEffFilter(c,fusfilter,e,tp,mg,gc,chkf,value,sumlimit)
 	return c:IsType(TYPE_FUSION) and (not fusfilter or fusfilter(c)) and c:IsCanBeSpecialSummoned(e,value,tp,sumlimit,false)
 			and c:CheckFusionMaterial(mg,gc,chkf)
 end
+
+Fusion.ForcedMatValidity=function(c,e)
+	if c==e:GetHandler() then
+		return (not c:IsFaceup() and c:IsLocation(LOCATION_ONFIELD)) or not c:IsRelateToEffect(e)
+	end
+	return c:IsImmuneToEffect(e)
+end
+
 Fusion.SummonEffTG = aux.FunctionWithNamedArgs(
-function(fusfilter,matfilter,extrafil,extraop,gc,stage2,exactcount,value,location,chkf)
+function(fusfilter,matfilter,extrafil,extraop,gc2,stage2,exactcount,value,location,chkf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				location = location or LOCATION_EXTRA
 				chkf = chkf and chkf|tp or tp
 				local sumlimit = (chkf&FUSPROC_NOTFUSION~=0)
-				if sumlimit then
-					value = value or 0
-				else
-					value = value and value|SUMMON_TYPE_FUSION or SUMMON_TYPE_FUSION
+				if not value then value=0 end
+				if not sumlimit then
+					value = value|SUMMON_TYPE_FUSION
 				end
-				gc = type(gc)=="function" and gc(e,tp,eg,ep,ev,re,r,rp,chk) or gc
+				local gc=gc2
+				gc=type(gc)=="function" and gc(e,tp,eg,ep,ev,re,r,rp,chk) or gc
+				gc=type(gc)=="Card" and Group.FromCards(gc) or gc
 				matfilter=matfilter or Card.IsAbleToGrave
 				stage2 = stage2 or aux.TRUE
 				if chk==0 then
@@ -53,7 +62,7 @@ function(fusfilter,matfilter,extrafil,extraop,gc,stage2,exactcount,value,locatio
 						end
 						checkAddition=ret[2]
 					end
-					if gc and not mg1:Includes(Group.CreateGroup()+gc) then return false end
+					if gc and not mg1:Includes(gc) then return false end
 					Fusion.CheckAdditional=checkAddition
 					mg1=mg1:Filter(Card.IsCanBeFusionMaterial,nil)
 					Fusion.CheckExact=exactcount
@@ -107,17 +116,18 @@ function Fusion.ChainMaterialPrompt(effswithgroup,cardID,tp,e)
 	return effs[Duel.SelectOption(tp,false,table.unpack(desctable)) + 1]
 end
 Fusion.SummonEffOP = aux.FunctionWithNamedArgs(
-function (fusfilter,matfilter,extrafil,extraop,gc,stage2,exactcount,value,location,chkf)
+function (fusfilter,matfilter,extrafil,extraop,gc2,stage2,exactcount,value,location,chkf)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				location = location or LOCATION_EXTRA
 				chkf = chkf and chkf|tp or tp
 				local sumlimit = (chkf&FUSPROC_NOTFUSION ~= 0)
-				if sumlimit then
-					value = value or 0
-				else
-					value = value and value|SUMMON_TYPE_FUSION or SUMMON_TYPE_FUSION
+				if not value then value=0 end
+				if not sumlimit then
+					value = value|SUMMON_TYPE_FUSION
 				end
-				gc = type(gc)=="function" and gc(e,tp,eg,ep,ev,re,r,rp,chk) or gc
+				local gc=gc2
+				gc=type(gc)=="function" and gc(e,tp,eg,ep,ev,re,r,rp,chk) or gc
+				gc=type(gc)=="Card" and Group.FromCards(gc) or gc
 				matfilter=matfilter or Card.IsAbleToGrave
 				stage2 = stage2 or aux.TRUE
 				local checkAddition
@@ -131,7 +141,7 @@ function (fusfilter,matfilter,extrafil,extraop,gc,stage2,exactcount,value,locati
 				end
 				mg1=mg1:Filter(Card.IsCanBeFusionMaterial,nil)
 				mg1=mg1:Filter(aux.NOT(Card.IsImmuneToEffect),nil,e)
-				if gc and not mg1:Includes(Group.CreateGroup()+gc) then return end
+				if gc and (not mg1:Includes(gc) or gc:IsExists(Fusion.ForcedMatValidity,1,nil,e)) then return false end
 				Fusion.CheckExact=exactcount
 				Fusion.CheckAdditional=checkAddition
 				local effswithgroup={}
@@ -264,7 +274,7 @@ end
 function Fusion.ForcedHandler(e)
 	return e:GetHandler()
 end
-function Fusion.ChechWithHandler(fun,...)
+function Fusion.CheckWithHandler(fun,...)
 	local funs={fun,...}
 	return function(c,e,...)
 		if c==e:GetHandler() then

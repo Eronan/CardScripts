@@ -34,6 +34,42 @@ function Auxiliary.CheckZonesReleaseSummonCheck(must,oneof,checkfunc)
 		return checkfunc(sg+must)>0 and count<2,count>=2
 	end
 end
+function Duel.MoveToDeckTop(obj)
+	local typ=type(obj)
+	if typ=="Group" then
+		for c in aux.Next(obj:Filter(Card.IsLocation,nil,LOCATION_DECK)) do
+			Duel.MoveSequence(c,SEQ_DECKTOP)
+		end
+	elseif typ=="Card" then
+		if obj:IsLocation(LOCATION_DECK) then
+			Duel.MoveSequence(obj,SEQ_DECKTOP)
+		end
+	else
+		error("Parameter 1 should be \"Card\" or \"Group\"",2)
+	end
+end
+function Duel.MoveToDeckBottom(obj,tp)
+	local typ=type(obj)
+	if typ=="number" then
+		if type(tp)~="number" then
+			error("Parameter 2 should be \"number\"",2)
+		end
+		for i=1,obj do
+			local mg=Duel.GetDecktopGroup(tp,1)
+			Duel.MoveSequence(mg:GetFirst(),SEQ_DECKBOTTOM)
+		end
+	elseif typ=="Group" then
+		for c in aux.Next(obj:Filter(Card.IsLocation,nil,LOCATION_DECK)) do
+			Duel.MoveSequence(c,SEQ_DECKBOTTOM)
+		end
+	elseif typ=="Card" then
+		if obj:IsLocation(LOCATION_DECK) then
+			Duel.MoveSequence(obj,SEQ_DECKBOTTOM)
+		end
+	else
+		error("Parameter 1 should be \"Card\" or \"Group\" or \"number\"",2)
+	end
+end
 function Duel.CheckReleaseGroupSummon(c,tp,e,fil,minc,maxc,last,...)
 	local zone=0xff
 	local params={...}
@@ -206,12 +242,11 @@ end
 function Card.IsPreviousControler(c,tp)
 	return c:GetPreviousControler()==tp
 end
-
 --Checks wheter a card has a level or not
 --For Links: false. For Xyzs: false, except if affected by  "EFFECT_RANK_LEVEL..." effects
 --For Dark Synchros: true, because they have a negative level. For level 0: true, because 0 is a value
 function Card.HasLevel(c)
-	return c:GetType()&TYPE_LINK~=TYPE_LINK 
+	return c:IsType(TYPE_MONSTER) and c:GetType()&TYPE_LINK~=TYPE_LINK
 		and (c:GetType()&TYPE_XYZ~=TYPE_XYZ and not (c:IsHasEffect(EFFECT_RANK_LEVEL) or c:IsHasEffect(EFFECT_RANK_LEVEL_S)))
 		and not c:IsStatus(STATUS_NO_LEVEL)
 end

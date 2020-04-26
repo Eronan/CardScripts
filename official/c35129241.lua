@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--spsummon
+	--special summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -34,6 +34,7 @@ end
 s.listed_series={0xa3}
 function s.filter(c,e,tp,re)
 	local re=c:GetReasonEffect()
+	if not re then return false end
 	local rc=re:GetHandler()
 	return c:IsSetCard(0xa3) and c:IsType(TYPE_SYNCHRO) and c:IsPreviousControler(tp)
 		and c:IsReason(REASON_COST) and rc==c

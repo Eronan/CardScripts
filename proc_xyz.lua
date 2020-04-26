@@ -477,7 +477,7 @@ function Xyz.Target(f,lv,minc,maxc,mustbemat,exchk)
 											tab[sc]=multi[1]
 											matct=matct+multi[1]
 										else
-											Duel.Hint(HINT_SELECTMSG,tp,513)
+											Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 											local num=Duel.AnnounceNumber(tp,table.unpack(multi))
 											tab[sc]=num
 											matct=matct+num
@@ -519,6 +519,7 @@ function Xyz.Target(f,lv,minc,maxc,mustbemat,exchk)
 						xg=xyztempg1
 					end
 					local mg
+					local g
 					if og then
 						g=og
 						mg=og:Filter(Xyz.MatFilter,nil,f,lv,c,tp)
@@ -593,7 +594,7 @@ function Xyz.Target(f,lv,minc,maxc,mustbemat,exchk)
 											tab[sc]=multi[1]
 										end
 									else
-										Duel.Hint(HINT_SELECTMSG,tp,513)
+										Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 										local num=Duel.AnnounceNumber(tp,table.unpack(multi))
 										if num>1 then
 											ct=ct+num-1

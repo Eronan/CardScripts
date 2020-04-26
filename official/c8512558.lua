@@ -43,15 +43,6 @@ function s.get_series(c)
 	if c:IsSetCard(0x8f) then table.insert(res,8) end
 	return res
 end
-function bitsplit(n)
-	local t={}
-	if n>7 then n=n-8 table.insert(t,8) end
-	if n>3 then n=n-4 table.insert(t,4) end
-	if n>1 then n=n-2 table.insert(t,2) end
-	if n>0 then n=n-1 table.insert(t,1) end
-	table.sort(t)
-	return t
-end
 function s.rescon(c,sg,arch_tab,e,tp,mg)
 	if not aux.ChkfMMZ(#sg)(sg,e,tp,mg) then return false end
 	local arch_lst=s.get_series(c)
@@ -118,12 +109,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	ge1:SetTarget(s.splimit)
 	ge1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(ge1,tp)
-	local e2=Effect.CreateEffect(e:GetHandler())
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT+EFFECT_FLAG_OATH)
-	e2:SetDescription(aux.Stringid(id,5))
-	e2:SetReset(RESET_PHASE+PHASE_END)
-	e2:SetTargetRange(1,0)
-	Duel.RegisterEffect(e2,tp)
+	aux.RegisterClientHint(e:GetHandler(),EFFECT_FLAG_OATH,tp,1,0,aux.Stringid(id,5),nil)
 end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsType(TYPE_XYZ) and c:IsLocation(LOCATION_EXTRA)
